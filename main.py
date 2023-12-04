@@ -1,3 +1,4 @@
+import argparse
 import os
 from pathlib import Path
 from urllib.parse import urljoin, urlsplit
@@ -64,7 +65,26 @@ def parse_book_page(response):
 
 def main():
     parsed_books = []
-    for book_number in range(1, 11):
+    parser = argparse.ArgumentParser(
+        description='Скачивает книги'
+    )
+    parser.add_argument(
+        '--start_id',
+        default=1,
+        help='Введите начальный номер книги',
+        type=int
+    )
+    parser.add_argument(
+        '--end_id',
+        default=11,
+        help='Введите конечный номер книги',
+        type=int
+    )
+    input_id = parser.parse_args()
+    if input_id.start_id >= input_id.end_id:
+        print('Неверно введены начальный и конечный номер книги. Повторите ввод.')
+        return
+    for book_number in range(input_id.start_id, input_id.end_id):
         url_for_txt = f"https://tululu.org/txt.php?id={book_number}"
         url_for_parsing = f"https://tululu.org/b{book_number}/"
         response = requests.get(url_for_parsing, allow_redirects=False)
