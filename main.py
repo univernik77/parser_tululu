@@ -67,8 +67,14 @@ def main():
         print(book)
         print(abs_url_to_image)
         comments = soup.find_all('div', class_='texts')
+
         for comment in comments:
-            print(comment.text.split(')')[-1])
+            print(comment.find('span', class_='black').text)
+        genres = soup.find('span', class_='d_book').find_all('a')
+        for number, genre in enumerate(genres):
+            genres[number]=genre.text
+
+        print(genres)
 
 if __name__ == "__main__":
     main()
