@@ -60,10 +60,15 @@ def main():
 
         book = title_tag.text.split('::')[0].strip()
         author = title_tag.text.split('::')[1].strip()
+
+
         download_txt(url, payload, book)
         download_image(abs_url_to_image)
         print(book)
         print(abs_url_to_image)
+        comments = soup.find_all('div', class_='texts')
+        for comment in comments:
+            print(comment.text.split(')')[-1])
 
 if __name__ == "__main__":
     main()
