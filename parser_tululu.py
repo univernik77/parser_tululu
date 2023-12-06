@@ -1,7 +1,7 @@
 import argparse
 import os
 from pathlib import Path
-from urllib.parse import urljoin, urlsplit
+from urllib.parse import urljoin, urlsplit, unquote
 
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
@@ -9,17 +9,21 @@ import requests
 
 
 def download_image(url, folder='images/'):
-    Path(folder.split('/')[0]).mkdir(parents=True, exist_ok=True)
+    Path(folder).mkdir(parents=True, exist_ok=True)
     response = requests.get(url)
     response.raise_for_status()
+    try:
+        check_for_redirect(response)
+    except requests.HTTPError:
+        return
     parsed_url = urlsplit(url)[2]
-    collected_path = os.path.join(folder, parsed_url.split('/')[-1])
+    collected_path = unquote(os.path.join(folder, parsed_url.split('/')[-1]))
     read_file(collected_path, response.content)
     return collected_path
 
 
 def download_txt(url, filename, folder='books/'):
-    Path(folder.split('/')[0]).mkdir(parents=True, exist_ok=True)
+    Path(folder).mkdir(parents=True, exist_ok=True)
     response = requests.get(url, allow_redirects=False)
     response.raise_for_status()
     try:
@@ -97,9 +101,6 @@ def main():
         download_txt(url_for_txt, parsed_book.get('title'))
         abs_url_to_image = urljoin(url_for_parsing, parsed_book.get('path_to_image'))
         download_image(abs_url_to_image)
-        parsed_books.append(parsed_book)
-
-    print(parsed_books)
 
 
 if __name__ == "__main__":
